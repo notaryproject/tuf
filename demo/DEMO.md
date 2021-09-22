@@ -2,6 +2,7 @@
 
 ## Install
 [branch of go-tuf](https://github.com/mnm678/go-tuf/tree/tuf-notary-demo)
+[ORAS client](https://github.com/oras-project/oras/releases)
 
 ## Push to registry
 ### create net-monitory image, upload to localhost
@@ -18,6 +19,7 @@ tuf add <digest>
 tuf snapshot
 tuf timestamp
 tuf commit
+cat repository/targets.json | jq
 ```
 
 ### Upload delegated targets to net-monitor
@@ -28,13 +30,21 @@ oras push localhost:5000/net-monitor \
       repository/targets.json:application/json
 ```
 
-### Upload top-level targets and root to tuf-metadata
+### Upload top-level targets and root to tuf-metadata (port 4000)
+```
+docker run -d -p 5000:4000 ghcr.io/oras-project/registry:v0.0.3-alpha
+oras push localhost:4000/tuf-metadata \
+      --artifact-type tuf/example \
+      --subject localhost:5000/root-ptr:v1 \
+      repository/root.json:application/json
+
+```
 TODO
 
 ## Pull from registry
 ### Find artifact references, fetch delegated targets
 ```
-Set DIGEST  (oras discover localhost:5000/net-monitor:v1 -o json | jq -r .digest)
+set DIGEST  (oras discover localhost:5000/net-monitor:v1 -o json | jq -r .digest)
 curl localhost:5000/oras/artifacts/v1/net-monitor/manifests/$DIGEST/referrers | jq
 oras pull -a \
       localhost:5000/net-monitor@( \
