@@ -30,16 +30,15 @@ oras push localhost:5000/net-monitor \
       repository/targets.json:application/json
 ```
 
-### Upload top-level targets and root to tuf-metadata (port 4000)
+### Upload top-level targets and root to tuf-metadata with root as an artifact that targets refers to
 ```
-docker run -d -p 5000:4000 ghcr.io/oras-project/registry:v0.0.3-alpha
-oras push localhost:4000/tuf-metadata \
-      --artifact-type tuf/example \
-      --subject localhost:5000/root-ptr:v1 \
-      repository/root.json:application/json
+oras push localhost:5000/tuf-repository:root repository/root.json:application/json
+oras push localhost:5000/tuf-repository:targets \
+			--artifact-type tuf/targets \
+			--subject localhost:5000/tuf-repository:root \
+			repository/targets.json:application/json
 
 ```
-TODO
 
 ## Pull from registry
 ### Find artifact references, fetch delegated targets
@@ -55,7 +54,16 @@ oras pull -a \
 ```
 
 ### Fetch root and top-level targets
-TODO
+```
+oras pull -a localhost:5000/tuf-repository:root
+Set DIGEST  (oras discover localhost:5000/tuf-repository:root -o json | jq -r .digest)
+curl localhost:5000/oras/artifacts/v1/tuf-repository/manifests/$DIGEST/referrers | jq
+oras pull -a localhost:5000/tuf-repository@( \
+         oras discover \
+         -o json \
+         --artifact-type=tuf/targets \
+         localhost:5000/tuf-repository:root | jq -r .references[0].digest)
+```
 
 ### Verify with go-tuf
 TODO
