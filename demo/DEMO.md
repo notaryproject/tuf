@@ -66,4 +66,15 @@ oras pull -a localhost:5000/tuf-repository@( \
 ```
 
 ### Verify with go-tuf
-TODO
+TODO: remove need to serve TUF repository locally
+
+in one terminal:
+```
+cd repository
+python -m http.server 8001
+```
+
+in another:
+```
+tuf-client get http://localhost:8001 <digest>
+```
