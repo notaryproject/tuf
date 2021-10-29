@@ -14,5 +14,18 @@ func Init(repository string) error {
 	}
 
 	//not using consistent snapshots
-	return repo.Init(false)
+	err = repo.Init(false)
+	if err != nil {
+		return err
+	}
+
+	//add targets key
+	_, err = repo.GenKey("targets")
+	if err != nil {
+		return err
+	}
+
+	return err
+
+	//return repo.Commit()
 }

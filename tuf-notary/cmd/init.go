@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/notaryproject/tuf/tuf-notary/tuf-notary"
 )
 
@@ -21,8 +23,21 @@ func cmdInit(args map[string]interface{}) error {
 	if r := args["--repo"]; r != nil {
 		repository = r.(string)
 	}
+
+	registry := args["<registry>"].(string)
+
 	err := tufnotary.Init(repository)
 
-	//TODO upload to registry
+	if err != nil {
+		return err
+	}
+
+	root_desc := tufnotary.UploadTUFMetadata(registry, repository, "root", "")
+	fmt.Println("uploaded root " + root_desc.Digest.String())
+
+	//targets_desc := tufnotary.UploadTUFMetadata(registry, repository, "targets", "")
+	//fmt.Println("uploaded targets " + targets_desc.Digest.String())
+
+
 	return err
 }
