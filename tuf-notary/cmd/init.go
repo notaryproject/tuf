@@ -32,11 +32,17 @@ func cmdInit(args map[string]interface{}) error {
 		return err
 	}
 
-	root_desc := tufnotary.UploadTUFMetadata(registry, repository, "root", "")
+	root_desc, err := tufnotary.UploadTUFMetadata(registry, repository, "root", "")
+	if err != nil {
+		return err
+	}
 	fmt.Println("uploaded root " + root_desc.Digest.String())
 
-	//targets_desc := tufnotary.UploadTUFMetadata(registry, repository, "targets", "")
-	//fmt.Println("uploaded targets " + targets_desc.Digest.String())
+	targets_desc, err := tufnotary.UploadTUFMetadata(registry, repository, "targets", "")
+	if err != nil {
+		return err
+	}
+	fmt.Println("uploaded targets " + targets_desc.Digest.String())
 
 
 	return err

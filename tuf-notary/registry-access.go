@@ -10,12 +10,12 @@ import (
     "oras.land/oras-go/pkg/oras"
 )
 
-func UploadTUFMetadata(registry string, repository string, name string, reference string) ocispec.Descriptor{
+func UploadTUFMetadata(registry string, repository string, name string, reference string) (ocispec.Descriptor, error) {
 	ref := registry + "/" + repository + ":" + name
-	fileName := repository + "/staged/" + name + ".json"
+	fileName := repository + "/repository/" + name + ".json"
 	contents, err := ioutil.ReadFile(fileName)
 	if err != nil {
-		return err
+		return ocispec.Descriptor{}, err
 	}
 
 	fileContent := []byte(contents)
@@ -28,30 +28,30 @@ func UploadTUFMetadata(registry string, repository string, name string, referenc
 	memoryStore := content.NewMemory()
     desc, err := memoryStore.Add(fileName, mediaType, fileContent)
 	if err != nil {
-		return err
+		return ocispec.Descriptor{}, err
 	}
 
 	manifest, manifestDesc, config, configDesc, err := content.GenerateManifestAndConfig(nil, nil, desc)
 	if err != nil {
-		return err
+		return ocispec.Descriptor{}, err
 	}
 
 	memoryStore.Set(configDesc, config)
 	err = memoryStore.StoreManifest(ref, manifestDesc, manifest)
 	if err != nil {
-		return err
+		return ocispec.Descriptor{}, err
 	}
 
 	reg, err := content.NewRegistry(content.RegistryOptions{PlainHTTP: true})
-	fmt.Println(reg)
+	//fmt.Println(reg)
 
 	//pushContents := []ocispec.Descriptor{desc}
 	//desc, err = oras.Push(ctx, resolver, ref, memoryStore, pushContents)
 	desc, err = oras.Copy(ctx, memoryStore, ref, reg, "")
 
 	if err != nil {
-		return err
+		return ocispec.Descriptor{}, err
 	}
 
-	return desc
+	return desc, nil
 }
