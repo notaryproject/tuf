@@ -11,7 +11,7 @@ func main() {
 	usage := `
 Usage:
   tuf-notary <command> [<args>....]
-  tuf-notary <command> [--registry=<registry>] [--repo=<repository>]
+  tuf-notary <command> [<args>....] [--repo=<repository>]
 
 Commands:
   help          Show usage for a specific command
@@ -32,13 +32,13 @@ Commands:
 		}
 	}
 
-	if err := runCommand(cmd, cmdArgs); err != nil {
+	if err := runCommand(cmd, cmdArgs, args); err != nil {
 		log.Fatalln("ERROR:", err)
 	}
 
 }
 
-type cmdFunc func(map[string]interface{}) error
+type cmdFunc func([]string, docopt.Opts) error
 
 type command struct {
 	usage string
@@ -51,7 +51,7 @@ func register(name string, f cmdFunc, usage string) {
 	commands[name] = &command{usage: usage, f: f}
 }
 
-func runCommand(name string, args []string) error {
+func runCommand(name string, args []string, opts docopt.Opts) error {
 	argv := make([]string, 1, 1+len(args))
 	argv[0] = name
 	argv = append(argv, args...)
@@ -61,10 +61,10 @@ func runCommand(name string, args []string) error {
 		return fmt.Errorf("%s is not a tuf-notary command. See 'tuf-notary help'", name)
 	}
 
-	parsedArgs, err := docopt.Parse(cmd.usage, argv, true, "", true)
+	_, err := docopt.ParseDoc(cmd.usage)
 	if err != nil {
 		return err
 	}
 
-	return cmd.f(parsedArgs)
+	return cmd.f(args, opts)
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/notaryproject/tuf/tuf-notary/tuf-notary"
+	docopt "github.com/docopt/docopt-go"
 )
 
 func init() {
@@ -18,13 +19,13 @@ Options:
   `)
 }
 
-func cmdInit(args map[string]interface{}) error {
+func cmdInit(args []string, opts docopt.Opts) error {
 	repository := "tuf-repo"
-	if r := args["--repo"]; r != nil {
+	if r := opts["--repo"]; r != nil {
 		repository = r.(string)
 	}
 
-	registry := args["<registry>"].(string)
+	registry := args[0]
 
 	err := tufnotary.Init(repository)
 

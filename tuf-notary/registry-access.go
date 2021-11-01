@@ -12,7 +12,7 @@ import (
 
 func UploadTUFMetadata(registry string, repository string, name string, reference string) (ocispec.Descriptor, error) {
 	ref := registry + "/" + repository + ":" + name
-	fileName := repository + "/repository/" + name + ".json"
+	fileName := repository + "/staged/" + name + ".json"
 	contents, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return ocispec.Descriptor{}, err
