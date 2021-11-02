@@ -43,12 +43,11 @@ func UploadTUFMetadata(registry string, repository string, name string, referenc
 	}
 
 	reg, err := content.NewRegistry(content.RegistryOptions{PlainHTTP: true})
-	//fmt.Println(reg)
+	if err != nil {
+		return ocispec.Descriptor{}, err
+	}
 
-	//pushContents := []ocispec.Descriptor{desc}
-	//desc, err = oras.Push(ctx, resolver, ref, memoryStore, pushContents)
 	desc, err = oras.Copy(ctx, memoryStore, ref, reg, "")
-
 	if err != nil {
 		return ocispec.Descriptor{}, err
 	}
