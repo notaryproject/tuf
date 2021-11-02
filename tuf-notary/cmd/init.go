@@ -33,13 +33,15 @@ func cmdInit(args []string, opts docopt.Opts) error {
 		return err
 	}
 
+	//upload root with no references
 	root_desc, err := tufnotary.UploadTUFMetadata(registry, repository, "root", "")
 	if err != nil {
 		return err
 	}
 	fmt.Println("uploaded root " + root_desc.Digest.String())
 
-	targets_desc, err := tufnotary.UploadTUFMetadata(registry, repository, "targets", "")
+	//upload targets with a reference to root metadata
+	targets_desc, err := tufnotary.UploadTUFMetadata(registry, repository, "targets", "root")
 	if err != nil {
 		return err
 	}
