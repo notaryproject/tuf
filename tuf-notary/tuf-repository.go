@@ -1,8 +1,6 @@
 package tufnotary
 
 import (
-	"fmt"
-
 	"github.com/theupdateframework/go-tuf"
 	util "github.com/theupdateframework/go-tuf/util"
 )
