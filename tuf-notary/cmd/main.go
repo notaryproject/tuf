@@ -35,7 +35,6 @@ Commands:
 	if err := runCommand(cmd, cmdArgs, args); err != nil {
 		log.Fatalln("ERROR:", err)
 	}
-
 }
 
 type cmdFunc func([]string, docopt.Opts) error

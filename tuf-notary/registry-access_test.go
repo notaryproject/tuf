@@ -11,9 +11,9 @@ import (
 	"github.com/distribution/distribution/v3/configuration"
 	"github.com/distribution/distribution/v3/registry"
 	_ "github.com/distribution/distribution/v3/registry/storage/driver/inmemory"
-	"github.com/stretchr/testify/assert"
-    "github.com/stretchr/testify/suite"
 	"github.com/phayes/freeport"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
 type RegistryTestSuite struct {
@@ -51,10 +51,8 @@ func (suite *RegistryTestSuite) TestUploadTUFMetadata() {
 	//file doesn't exist
 	desc, err = UploadTUFMetadata(suite.RegistryHost, "test-tuf-repo", "bad", "")
 	assert.NotNil(suite.T(), err)
-
 }
 
-
 func TestRegistryTestSuite(t *testing.T) {
-    suite.Run(t, new(RegistryTestSuite))
+	suite.Run(t, new(RegistryTestSuite))
 }

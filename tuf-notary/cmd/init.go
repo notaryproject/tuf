@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/notaryproject/tuf/tuf-notary/tuf-notary"
 	docopt "github.com/docopt/docopt-go"
+	tufnotary "github.com/notaryproject/tuf/tuf-notary/tuf-notary"
 )
 
 func init() {
@@ -44,7 +44,6 @@ func cmdInit(args []string, opts docopt.Opts) error {
 		return err
 	}
 	fmt.Println("uploaded targets " + targets_desc.Digest.String())
-
 
 	return err
 }

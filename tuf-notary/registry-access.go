@@ -5,9 +5,8 @@ import (
 	"io/ioutil"
 
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
-
-    "oras.land/oras-go/pkg/content"
-    "oras.land/oras-go/pkg/oras"
+	"oras.land/oras-go/pkg/content"
+	"oras.land/oras-go/pkg/oras"
 )
 
 func UploadTUFMetadata(registry string, repository string, name string, reference string) (ocispec.Descriptor, error) {
@@ -26,7 +25,7 @@ func UploadTUFMetadata(registry string, repository string, name string, referenc
 	// TODO: add reference once it's supported in oras-go: https://github.com/oras-project/oras-go/pull/35
 
 	memoryStore := content.NewMemory()
-    desc, err := memoryStore.Add(fileName, mediaType, fileContent)
+	desc, err := memoryStore.Add(fileName, mediaType, fileContent)
 	if err != nil {
 		return ocispec.Descriptor{}, err
 	}
