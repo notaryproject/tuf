@@ -14,5 +14,47 @@ func Init(repository string) error {
 	}
 
 	//not using consistent snapshots
-	return repo.Init(false)
+	err = repo.Init(false)
+	if err != nil {
+		return err
+	}
+
+	//add root key
+	_, err = repo.GenKey("root")
+	if err != nil {
+		return err
+	}
+
+	//add targets key
+	_, err = repo.GenKey("targets")
+	if err != nil {
+		return err
+	}
+
+	//add snapshot key
+	_, err = repo.GenKey("snapshot")
+	if err != nil {
+		return err
+	}
+
+	//add timestamp key
+	_, err = repo.GenKey("timestamp")
+	if err != nil {
+		return err
+	}
+
+	//make empty targets metadata
+	emptyTargets := []string{}
+	err = repo.AddTargets(emptyTargets, nil)
+	if err != nil {
+		return err
+	}
+
+	err = repo.Snapshot()
+	if err != nil {
+		return err
+	}
+
+	err = repo.Timestamp()
+	return err
 }

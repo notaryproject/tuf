@@ -1,7 +1,10 @@
 package main
 
 import (
-	"github.com/notaryproject/tuf/tuf-notary/tuf-notary"
+	"fmt"
+
+	docopt "github.com/docopt/docopt-go"
+	tufnotary "github.com/notaryproject/tuf/tuf-notary/tuf-notary"
 )
 
 func init() {
@@ -16,13 +19,33 @@ Options:
   `)
 }
 
-func cmdInit(args map[string]interface{}) error {
+func cmdInit(args []string, opts docopt.Opts) error {
 	repository := "tuf-repo"
-	if r := args["--repo"]; r != nil {
+	if r := opts["--repo"]; r != nil {
 		repository = r.(string)
 	}
+
+	registry := args[0]
+
 	err := tufnotary.Init(repository)
 
-	//TODO upload to registry
+	if err != nil {
+		return err
+	}
+
+	//upload root with no references
+	root_desc, err := tufnotary.UploadTUFMetadata(registry, repository, "root", "")
+	if err != nil {
+		return err
+	}
+	fmt.Println("uploaded root " + root_desc.Digest.String())
+
+	//upload targets with a reference to root metadata
+	targets_desc, err := tufnotary.UploadTUFMetadata(registry, repository, "targets", "root")
+	if err != nil {
+		return err
+	}
+	fmt.Println("uploaded targets " + targets_desc.Digest.String())
+
 	return err
 }
