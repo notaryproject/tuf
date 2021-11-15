@@ -16,6 +16,7 @@ Usage:
 Commands:
   help          Show usage for a specific command
   init			Initialize a TUF repository
+  delegate		Delegate to a repository from the TUF repository
 	`
 
 	args, _ := docopt.ParseDoc(usage)

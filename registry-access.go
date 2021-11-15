@@ -10,7 +10,7 @@ import (
 
 func UploadTUFMetadata(registry string, repository string, name string, contents []byte, reference string) (ocispec.Descriptor, error) {
 	ref := registry + "/" + repository + ":" + name
-	fileName := repository + "/staged/" + name + ".json"
+	fileName := repository + "/repository/" + name + ".json"
 
 	mediaType := "application/vnd.cncf.notary.tuf+json"
 
