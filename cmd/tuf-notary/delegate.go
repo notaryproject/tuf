@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	docopt "github.com/docopt/docopt-go"
 	tufnotary "github.com/notaryproject/tuf/tuf-notary/tuf-notary"
@@ -9,13 +10,15 @@ import (
 
 func init() {
 	register("delegate", cmdDelegate, `
-usage: tuf-notary delegate <registry> <delegateeName> [--repo=<repository> --keyfile=<path>] 
+usage: tuf-notary delegate <registry> <delegateeName> [--repo=<repository> --keyfiles=<namess> --threshold=<threshold>]
 
 Add a delegation from the top-level targets role to delegatee and
 push the updated targets metadata to the TUF reposistory on the registry.
 
 Options:
-  --repo	Set the tuf repository name. By default this will be 'tuf-repo'
+  --repo		Set the tuf repository name. By default this will be 'tuf-repo'
+  --keyfiles	Comma separaged names of public key files stored in tuf-repo/keys that will be used to sign this delegated role. If none are supplied, a keypair will be generated and written to tuf-repo/keys/<delegate>
+  --threshold	The threshold for the delegation. By default this will be 1.
   `)
 }
 
@@ -25,14 +28,19 @@ func cmdDelegate(args []string, opts docopt.Opts) error {
 		repository = r.(string)
 	}
 
-	//TODO support multiple keys
-	keyfiles := []string{}
-	if k := opts["--keyfile"]; k != nil {
-		keyfiles = append(keyfiles, k.(string))
+	threshold := 1
+	if t := opts["-threshold"]; t != nil {
+		threshold = t.(int)
 	}
 
-	//TODO get from user
-	threshold := 1
+	keyfiles := []string{}
+	if k := opts["--keyfiles"]; k != nil {
+		ks := k.(string)
+		splitKeys := strings.Split(ks, ",")
+		for _, key := range splitKeys {
+			keyfiles = append(keyfiles, key)
+		}
+	}
 
 	registry := args[0]
 	delegatee := args[1]

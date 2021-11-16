@@ -2,7 +2,6 @@ package tufnotary
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -89,6 +88,7 @@ func Delegate(repository string, delegatee string, keyfiles []string, threshold 
 	pubkeys := []*data.PublicKey{}
 	privkeys := []keys.Signer{}
 	keyids := []string{}
+	// if no keyfiles are provided, generate one
 	if len(keyfiles) < 1 {
 		key, err := keys.GenerateEd25519Key()
 		if err != nil {
@@ -97,19 +97,22 @@ func Delegate(repository string, delegatee string, keyfiles []string, threshold 
 		pubkeys = append(pubkeys, key.PublicData())
 		privkeys = append(privkeys, key)
 		fmt.Println(key.PublicData())
-		for id, _ := range key.PublicData().IDs() {
-			fmt.Println(id)
-			//keyids = append(keyids, id)
+		for _, id := range key.PublicData().IDs() {
+			keyids = append(keyids, id)
 		}
 	} else {
-		//TODO parse keys, multiple keys
-		//also probably make this a helper function
-		_, err := ioutil.ReadFile(filepath.Join(workingDir, keyfiles[0]))
-		if err != nil {
-			return err
+		for _, filename := range keyfiles {
+			filePubKeys, err := repo.GetPublicKeys(filename)
+			if err != nil {
+				return err
+			}
+			for _, filePubKey := range filePubKeys {
+				pubkeys = append(pubkeys, filePubKey)
+				for _, keyid := range filePubKey.IDs() {
+					keyids = append(keyids, keyid)
+				}
+			}
 		}
-		// pubkeys = append(pubkeys, key)
-		// keyids = append(keyids, keyid)
 	}
 
 	paths := []string{}
