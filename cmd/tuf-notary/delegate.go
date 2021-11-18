@@ -45,10 +45,17 @@ func cmdDelegate(args []string, opts docopt.Opts) error {
 	registry := args[0]
 	delegatee := args[1]
 
-	//TODO: pull current targets metadata from the registry
+	err := tufnotary.DownloadTUFMetadata(registry, repository, "root")
+	if err != nil {
+		return err
+	}
+	err = tufnotary.DownloadTUFMetadata(registry, repository, "targets")
+	if err != nil {
+		return err
+	}
 
 	//add delegation
-	err := tufnotary.Delegate(repository, delegatee, keyfiles, threshold)
+	err = tufnotary.Delegate(repository, delegatee, keyfiles, threshold)
 
 	if err != nil {
 		return err

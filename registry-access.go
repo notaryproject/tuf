@@ -47,3 +47,21 @@ func UploadTUFMetadata(registry string, repository string, name string, contents
 
 	return desc, nil
 }
+
+func DownloadTUFMetadata(registry string, repository string, name string) error {
+	ref := registry + "/" + repository + ":" + name
+
+	mediaType := "application/vnd.cncf.notary.tuf+json"
+	ctx := context.Background()
+
+	reg, err := content.NewRegistry(content.RegistryOptions{PlainHTTP: true})
+	if err != nil {
+		return err
+	}
+
+	fileStore := content.NewFile("")
+	defer fileStore.Close()
+	allowedMediaTypes := []string{mediaType}
+	desc, err := oras.Copy(ctx, reg, ref, fileStore, "", oras.WithAllowedMediaTypes(allowedMediaTypes))
+	return err
+}
