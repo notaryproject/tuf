@@ -2,22 +2,16 @@ package tufnotary
 
 import (
 	"context"
-	"io/ioutil"
 
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"oras.land/oras-go/pkg/content"
 	"oras.land/oras-go/pkg/oras"
 )
 
-func UploadTUFMetadata(registry string, repository string, name string, reference string) (ocispec.Descriptor, error) {
+func UploadTUFMetadata(registry string, repository string, name string, contents []byte, reference string) (ocispec.Descriptor, error) {
 	ref := registry + "/" + repository + ":" + name
 	fileName := repository + "/staged/" + name + ".json"
-	contents, err := ioutil.ReadFile(fileName)
-	if err != nil {
-		return ocispec.Descriptor{}, err
-	}
 
-	fileContent := []byte(contents)
 	mediaType := "application/vnd.cncf.notary.tuf+json"
 
 	ctx := context.Background()
@@ -25,7 +19,7 @@ func UploadTUFMetadata(registry string, repository string, name string, referenc
 	// TODO: add reference once it's supported in oras-go: https://github.com/oras-project/oras-go/pull/35
 
 	memoryStore := content.NewMemory()
-	desc, err := memoryStore.Add(fileName, mediaType, fileContent)
+	desc, err := memoryStore.Add(fileName, mediaType, contents)
 	if err != nil {
 		return ocispec.Descriptor{}, err
 	}

@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 
 	docopt "github.com/docopt/docopt-go"
-	tufnotary "github.com/notaryproject/tuf/tuf-notary/tuf-notary"
+	tufnotary "github.com/notaryproject/tuf/tuf-notary"
 )
 
 func init() {
@@ -34,14 +35,24 @@ func cmdInit(args []string, opts docopt.Opts) error {
 	}
 
 	//upload root with no references
-	root_desc, err := tufnotary.UploadTUFMetadata(registry, repository, "root", "")
+	filename := fmt.Sprintf("%s/staged/%s.json", repository, "root")
+	contents, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return fmt.Errorf("failed to read %s: %w", filename, err)
+	}
+	root_desc, err := tufnotary.UploadTUFMetadata(registry, repository, "root", contents, "")
 	if err != nil {
 		return err
 	}
 	fmt.Println("uploaded root " + root_desc.Digest.String())
 
 	//upload targets with a reference to root metadata
-	targets_desc, err := tufnotary.UploadTUFMetadata(registry, repository, "targets", "root")
+	filename = fmt.Sprintf("%s/staged/%s.json", repository, "root")
+	contents, err = ioutil.ReadFile(filename)
+	if err != nil {
+		return fmt.Errorf("failed to read %s: %w", filename, err)
+	}
+	targets_desc, err := tufnotary.UploadTUFMetadata(registry, repository, "targets", contents, "root")
 	if err != nil {
 		return err
 	}
