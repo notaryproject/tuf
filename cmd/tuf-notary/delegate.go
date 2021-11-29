@@ -10,7 +10,7 @@ import (
 
 func init() {
 	register("delegate", cmdDelegate, `
-usage: tuf-notary delegate <registry> <delegateeName> [--repo=<repository> --keyfiles=<namess> --threshold=<threshold>]
+usage: tuf-notary delegate <registry> <delegateeName> [--repo=<repository> --keyfiles=<namess> --threshold=<threshold> --no-passphrase]
 
 Add a delegation from the top-level targets role to delegatee and
 push the updated targets metadata to the TUF reposistory on the registry.
@@ -42,6 +42,11 @@ func cmdDelegate(args []string, opts docopt.Opts) error {
 		}
 	}
 
+	passphrase := true
+	if p := opts["--no-passphrase"]; p != nil {
+		passphrase = !p.(bool)
+	}
+
 	registry := args[0]
 	delegatee := args[1]
 
@@ -55,7 +60,7 @@ func cmdDelegate(args []string, opts docopt.Opts) error {
 	}
 
 	//add delegation
-	err = tufnotary.Delegate(repository, delegatee, keyfiles, threshold)
+	err = tufnotary.Delegate(repository, delegatee, keyfiles, threshold, passphrase)
 
 	if err != nil {
 		return err

@@ -11,7 +11,7 @@ func main() {
 	usage := `
 Usage:
   tuf-notary <command> [<args>....]
-  tuf-notary <command> [<args>....] [--repo=<repository> --keyfiles=<names> --threshold<threshold>]
+  tuf-notary <command> [<args>....] [--repo=<repository> --keyfiles=<names> --threshold=<threshold> --no-passphrase]
 
 Commands:
   help          Show usage for a specific command

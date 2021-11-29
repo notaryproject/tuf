@@ -62,6 +62,6 @@ func DownloadTUFMetadata(registry string, repository string, name string) error 
 	fileStore := content.NewFile("")
 	defer fileStore.Close()
 	allowedMediaTypes := []string{mediaType}
-	desc, err := oras.Copy(ctx, reg, ref, fileStore, "", oras.WithAllowedMediaTypes(allowedMediaTypes))
+	_, err = oras.Copy(ctx, reg, ref, fileStore, "", oras.WithAllowedMediaTypes(allowedMediaTypes))
 	return err
 }

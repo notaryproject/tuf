@@ -1,14 +1,19 @@
 package tufnotary
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
+	"syscall"
 
 	"github.com/theupdateframework/go-tuf"
 	"github.com/theupdateframework/go-tuf/data"
 	"github.com/theupdateframework/go-tuf/pkg/keys"
 	util "github.com/theupdateframework/go-tuf/util"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 func Init(repository string) error {
@@ -65,7 +70,7 @@ func Init(repository string) error {
 	return err
 }
 
-func Delegate(repository string, delegatee string, keyfiles []string, threshold int) error {
+func Delegate(repository string, delegatee string, keyfiles []string, threshold int, passphrase bool) error {
 	workingDir, err := os.Getwd()
 	if err != nil {
 		return err
@@ -73,12 +78,10 @@ func Delegate(repository string, delegatee string, keyfiles []string, threshold 
 
 	dir := filepath.Join(workingDir, repository)
 
-	//TODO: allow for this to be true
-	// insecure := true
 	var p util.PassphraseFunc
-	//if !insecure {
-	//p = getPassphrase
-	//}
+	if passphrase {
+		p = getPassphrase
+	}
 
 	repo, err := tuf.NewRepo(tuf.FileSystemStore(dir, p))
 	if err != nil {
@@ -147,4 +150,34 @@ func Delegate(repository string, delegatee string, keyfiles []string, threshold 
 
 	err = repo.Commit()
 	return err
+}
+
+//from go-tuf/cmd/tuf/main.go
+func getPassphrase(role string, confirm bool) ([]byte, error) {
+	if pass := os.Getenv(fmt.Sprintf("TUF_%s_PASSPHRASE", strings.ToUpper(role))); pass != "" {
+		return []byte(pass), nil
+	}
+
+	fmt.Printf("Enter %s keys passphrase: ", role)
+	passphrase, err := terminal.ReadPassword(int(syscall.Stdin))
+	fmt.Println()
+	if err != nil {
+		return nil, err
+	}
+
+	if !confirm {
+		return passphrase, nil
+	}
+
+	fmt.Printf("Repeat %s keys passphrase: ", role)
+	confirmation, err := terminal.ReadPassword(int(syscall.Stdin))
+	fmt.Println()
+	if err != nil {
+		return nil, err
+	}
+
+	if !bytes.Equal(passphrase, confirmation) {
+		return nil, errors.New("The entered passphrases do not match")
+	}
+	return passphrase, nil
 }
