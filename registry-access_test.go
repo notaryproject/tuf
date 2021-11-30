@@ -3,6 +3,7 @@ package tufnotary
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"strings"
 	"testing"
 	"time"
@@ -38,18 +39,17 @@ func (suite *RegistryTestSuite) SetupTest() {
 }
 
 func (suite *RegistryTestSuite) TestUploadTUFMetadata() {
+	contents, err := ioutil.ReadFile("test/tuf-repo/staged/root.json")
+	assert.Nil(suite.T(), err)
+
 	//good case
-	desc, err := UploadTUFMetadata(suite.RegistryHost, "test-tuf-repo", "root", "")
+	desc, err := UploadTUFMetadata(suite.RegistryHost, "test-tuf-repo", "root", contents, "")
 	assert.Nil(suite.T(), err)
 	assert.True(suite.T(), strings.HasPrefix(desc.Digest.String(), "sha256"))
 
 	//bad registry
 	badHost := fmt.Sprintf("localhost:%d", 2)
-	desc, err = UploadTUFMetadata(badHost, "test-tuf-repo", "root", "")
-	assert.NotNil(suite.T(), err)
-
-	//file doesn't exist
-	desc, err = UploadTUFMetadata(suite.RegistryHost, "test-tuf-repo", "bad", "")
+	desc, err = UploadTUFMetadata(badHost, "test-tuf-repo", "root", contents, "")
 	assert.NotNil(suite.T(), err)
 }
 
