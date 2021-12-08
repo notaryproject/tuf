@@ -16,6 +16,8 @@ Usage:
 Commands:
   help          Show usage for a specific command
   init			Initialize a TUF repository
+  snapshot		Create and upload snapshot
+  timestamp		Create and upload timestamp
 	`
 
 	args, _ := docopt.ParseDoc(usage)
