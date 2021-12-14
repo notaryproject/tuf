@@ -23,6 +23,11 @@ Downloads the delegated targets metadata that references `<artifact>`,
 and the top-level tuf metadata from the `<tuf-repo>`,
 then performs tuf verification.
 
+`tuf-notary move <artifact> <from-repo> <from-registry> [--toreg=<to-registry>] [--torepo=<to-repo>][--destTUFrepo=<to-tuf-repo>][--delegateto=<keyids>]`
+Copies `<artifact>` from `<from-registry>/<from-repo>` to `<to-registry>/<to-repo>`. By default, `<to-registry>` and `<to-repo>` are the same as `<from-registry>` and `<from-repo>` respectively.
+
+By default, all delegated targets metadata that references this artifact is also copied, and a delegation is created in `<to-tuf-repo>` to each listed keyid.
+
 ## Low level CLI
 
 `tuf-notary update-targets`\
