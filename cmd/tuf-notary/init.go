@@ -40,7 +40,7 @@ func cmdInit(args []string, opts docopt.Opts) error {
 	if err != nil {
 		return fmt.Errorf("failed to read %s: %w", filename, err)
 	}
-	root_desc, err := tufnotary.UploadTUFMetadata(registry, repository, "root", contents, "")
+	root_desc, err := tufnotary.UploadTUFMetadata(registry, repository, "root", contents)
 	if err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func cmdInit(args []string, opts docopt.Opts) error {
 	if err != nil {
 		return fmt.Errorf("failed to read %s: %w", filename, err)
 	}
-	targets_desc, err := tufnotary.UploadTUFMetadata(registry, repository, "targets", contents, "root")
+	targets_desc, err := tufnotary.UploadTUFMetadataWithReference(registry, repository, "targets", contents, root_desc)
 	if err != nil {
 		return err
 	}
