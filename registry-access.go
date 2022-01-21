@@ -31,13 +31,13 @@ func UploadTUFMetadataWithReference(registry string, repository string, name str
 	}
 
 	var descs []artifactspec.Descriptor
-	descs[0] = artifactspec.Descriptor{
+	descs = append(descs, artifactspec.Descriptor{
 		MediaType:   desc.MediaType,
 		Digest:      desc.Digest,
 		Size:        desc.Size,
 		URLs:        desc.URLs,
 		Annotations: desc.Annotations,
-	}
+	})
 
 	manifest := artifactspec.Manifest{
 		MediaType:    "application/vnd.cncf.oras.artifact.manifest.v1+json",
