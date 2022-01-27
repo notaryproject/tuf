@@ -13,7 +13,7 @@ import (
 	"github.com/theupdateframework/go-tuf/data"
 	"github.com/theupdateframework/go-tuf/pkg/keys"
 	util "github.com/theupdateframework/go-tuf/util"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 func Init(repository string) error {
@@ -133,6 +133,11 @@ func Delegate(repository string, delegatee string, keyfiles []string, threshold 
 		return err
 	}
 
+	err = repo.Sign(delegatee)
+	if err != nil {
+		return err
+	}
+
 	//if keys were generated, store them
 	// for k := range privkeys {
 	// repo.local.SaveSigner(delegatee, k)
@@ -153,13 +158,25 @@ func Delegate(repository string, delegatee string, keyfiles []string, threshold 
 }
 
 //from go-tuf/cmd/tuf/main.go
-func getPassphrase(role string, confirm bool) ([]byte, error) {
-	if pass := os.Getenv(fmt.Sprintf("TUF_%s_PASSPHRASE", strings.ToUpper(role))); pass != "" {
+
+func getPassphrase(role string, confirm bool, change bool) ([]byte, error) {
+	// In case of change we need to prompt explicitly for a new passphrase
+	// and not read it from the environment variable, if present
+	if pass := os.Getenv(fmt.Sprintf("TUF_%s_PASSPHRASE", strings.ToUpper(role))); pass != "" && !change {
 		return []byte(pass), nil
 	}
-
+	// Alter role string if we are prompting for a passphrase change
+	if change {
+		// Check if environment variable for new passphrase exist
+		if new_pass := os.Getenv(fmt.Sprintf("TUF_NEW_%s_PASSPHRASE", strings.ToUpper(role))); new_pass != "" {
+			// If so, just read the new passphrase from it and return
+			return []byte(new_pass), nil
+		}
+		// No environment variable set, so proceed prompting for new passphrase
+		role = fmt.Sprintf("new %s", role)
+	}
 	fmt.Printf("Enter %s keys passphrase: ", role)
-	passphrase, err := terminal.ReadPassword(int(syscall.Stdin))
+	passphrase, err := term.ReadPassword(int(syscall.Stdin))
 	fmt.Println()
 	if err != nil {
 		return nil, err
@@ -170,14 +187,14 @@ func getPassphrase(role string, confirm bool) ([]byte, error) {
 	}
 
 	fmt.Printf("Repeat %s keys passphrase: ", role)
-	confirmation, err := terminal.ReadPassword(int(syscall.Stdin))
+	confirmation, err := term.ReadPassword(int(syscall.Stdin))
 	fmt.Println()
 	if err != nil {
 		return nil, err
 	}
 
 	if !bytes.Equal(passphrase, confirmation) {
-		return nil, errors.New("The entered passphrases do not match")
+		return nil, errors.New("the entered passphrases do not match")
 	}
 	return passphrase, nil
 }

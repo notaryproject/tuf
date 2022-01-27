@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"strings"
 
 	docopt "github.com/docopt/docopt-go"
-	tufnotary "github.com/notaryproject/tuf/tuf-notary/tuf-notary"
+	tufnotary "github.com/notaryproject/tuf/tuf-notary"
 )
 
 func init() {
 	register("delegate", cmdDelegate, `
-usage: tuf-notary delegate <registry> <delegateeName> [--repo=<repository> --keyfiles=<namess> --threshold=<threshold> --no-passphrase]
+usage: tuf-notary delegate <registry> <delegateeName> [--repo=<repository> --keyfiles=<names> --threshold=<threshold> --no-passphrase]
 
 Add a delegation from the top-level targets role to delegatee and
 push the updated targets metadata to the TUF reposistory on the registry.
@@ -68,7 +69,12 @@ func cmdDelegate(args []string, opts docopt.Opts) error {
 	fmt.Println("added delegation to " + delegatee)
 
 	//upload targets with a reference to root metadata
-	targets_desc, err := tufnotary.UploadTUFMetadata(registry, repository, "targets", "root")
+	filename := fmt.Sprintf("%s/staged/%s.json", repository, "targets")
+	contents, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return fmt.Errorf("failed to read %s: %w", filename, err)
+	}
+	targets_desc, err := tufnotary.UploadTUFMetadata(registry, repository, "targets", contents, "root")
 	if err != nil {
 		return err
 	}
