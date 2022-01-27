@@ -47,7 +47,7 @@ func cmdInit(args []string, opts docopt.Opts) error {
 	fmt.Println("uploaded root " + root_desc.Digest.String())
 
 	//upload targets with a reference to root metadata
-	filename = fmt.Sprintf("%s/staged/%s.json", repository, "root")
+	filename = fmt.Sprintf("%s/staged/%s.json", repository, "targets")
 	contents, err = ioutil.ReadFile(filename)
 	if err != nil {
 		return fmt.Errorf("failed to read %s: %w", filename, err)
