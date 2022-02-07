@@ -1,17 +1,20 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"strconv"
 
 	docopt "github.com/docopt/docopt-go"
 	tufnotary "github.com/notaryproject/tuf/tuf-notary"
+	godigest "github.com/opencontainers/go-digest"
+	artifactspec "github.com/oras-project/artifacts-spec/specs-go/v1"
 )
 
 func init() {
 	register("sign", cmdSign, `
-usage: tuf-notary sign <registry> <rolename> <digest> <length> [--repo=<repository>]
+usage: tuf-notary sign <registry> <rolename> <digest> <length> <mediatype> [--repo=<repository>]
 
 Sign digest and upload the signature alongside it to rolename repo on
 the registry. This will add a tuf targets metadata file to the repository.
@@ -34,6 +37,7 @@ func cmdSign(args []string, opts docopt.Opts) error {
 	if err != nil {
 		return err
 	}
+	mediatype := args[4]
 
 	//TODO verify these
 	err = tufnotary.DownloadTUFMetadata(registry, repository, "root")
@@ -48,9 +52,14 @@ func cmdSign(args []string, opts docopt.Opts) error {
 	//TODO add new delegation in the repo for this signature, add this there
 	// blocking on the delegations pr in go-tuf
 
-	// TODO add descriptor
-	//descriptor := nil
-	err = tufnotary.Sign(repository, signer, digest, length, nil)
+	descriptor := artifactspec.Descriptor{
+		MediaType: mediatype,
+		Digest:    godigest.FromString(digest),
+		Size:      length,
+	}
+	bytes, _ := json.Marshal(&descriptor)
+	fmt.Println(json.RawMessage(bytes))
+	err = tufnotary.Sign(repository, signer, digest, length, json.RawMessage(bytes))
 
 	if err != nil {
 		return err
