@@ -4,7 +4,8 @@ go 1.17
 
 require (
 	github.com/distribution/distribution/v3 v3.0.0-20210926092439-1563384b69df
-	github.com/opencontainers/image-spec v1.0.1
+	github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815
+	github.com/opencontainers/image-spec v1.0.2
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/stretchr/testify v1.7.0
 	github.com/theupdateframework/go-tuf v0.0.0-20211018203538-5908a16987fa
@@ -31,9 +32,7 @@ require (
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/docker/libtrust v0.0.0-20150114040149-fa567046d9b1 // indirect
-	github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
-	github.com/flynn/go-docopt v0.0.0-20140912013429-f6dd2ebbb31e // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gomodule/redigo v1.8.2 // indirect
