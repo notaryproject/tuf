@@ -7,7 +7,7 @@ require upstream TUF spec changes or extensions, as there are some differences b
 registry model and common usage to other TUF use cases. This project will use existing
 registry extensions where available but may need its own document types in addition.
 
-The initial version of notary TUF-based implementation ran as an additional service on a registry, so was not
+The notary TUF-based implementation ran as an additional service on a registry, so was not
 available everywhere and did not create native registry artifacts. In turn this meant
 that moving signatures between registries was not supported. The notary TUF-based implementation also made some
 changes to the TUF security model, like defaulting to TOFU, which in retrospect were
