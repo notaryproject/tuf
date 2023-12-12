@@ -10,7 +10,7 @@ import (
 
 func UploadTUFMetadata(registry string, repository string, name string, contents []byte, reference string) (ocispec.Descriptor, error) {
 	ref := registry + "/" + repository + ":" + name
-	fileName := repository + "/staged/" + name + ".json"
+	fileName := repository + "/repository/" + name + ".json"
 
 	mediaType := "application/vnd.cncf.notary.tuf+json"
 
@@ -46,4 +46,22 @@ func UploadTUFMetadata(registry string, repository string, name string, contents
 	}
 
 	return desc, nil
+}
+
+func DownloadTUFMetadata(registry string, repository string, name string) error {
+	ref := registry + "/" + repository + ":" + name
+
+	mediaType := "application/vnd.cncf.notary.tuf+json"
+	ctx := context.Background()
+
+	reg, err := content.NewRegistry(content.RegistryOptions{PlainHTTP: true})
+	if err != nil {
+		return err
+	}
+
+	fileStore := content.NewFile("")
+	defer fileStore.Close()
+	allowedMediaTypes := []string{mediaType}
+	_, err = oras.Copy(ctx, reg, ref, fileStore, "", oras.WithAllowedMediaTypes(allowedMediaTypes))
+	return err
 }
